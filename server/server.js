@@ -1,10 +1,10 @@
 // server/server.js
-
+const authRoutes = require("./routes/authRoutes");
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-
+const ScanHistory = require("./models/ScanHistory");
 const connectDB = require("./config/db");
 const getWhoisData = require("./services/whoisService");
 const getSSLData = require("./services/sslService");
@@ -23,7 +23,7 @@ Temporary MongoDB OFF for testing
 ========================================
 */
 
-// connectDB();
+connectDB();
 
 /*
 ========================================
@@ -33,6 +33,7 @@ MIDDLEWARE
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
 
 /*
 ========================================
@@ -176,8 +177,19 @@ app.post("/api/scan-url", async (req, res) => {
     Temporary direct response
     MongoDB save disabled for stability
     */
+await ScanHistory.create({
+  scannedUrl: result.scannedUrl,
+  riskScore: result.riskScore,
+  status: result.status,
+  threatType: result.threatType,
+  message: result.message,
+});
 
-    return res.json(result);
+console.log("Saved to MongoDB:", result);
+
+
+return res.json(result);
+  
 
   } catch (error) {
     console.log(error);
@@ -200,8 +212,14 @@ app.get("/api/history", async (req, res) => {
     Temporary static response
     while MongoDB disabled
     */
+  const history = await ScanHistory.find().sort({
+  createdAt: -1,
+});
 
-    return res.json([]);
+
+return res.json(history);
+
+  
 
   } catch (error) {
     return res.status(500).json({
@@ -214,11 +232,11 @@ app.delete("/api/delete-history/:id", async (req, res) => {
     const { id } = req.params;
 
     // Temporary response while MongoDB disabled
-    return res.json({
-      message: "Record deleted successfully",
-      deletedId: id,
-    });
+    await ScanHistory.findByIdAndDelete(id);
 
+return res.json({
+  message: "Record deleted successfully",
+});
     /*
     Later enable:
 

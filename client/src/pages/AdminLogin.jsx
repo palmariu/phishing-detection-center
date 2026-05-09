@@ -1,18 +1,34 @@
 import { useState } from "react";
+import axios from "axios";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (
-      email === "admin@gmail.com" &&
-      password === "admin123"
-    ) {
-      localStorage.setItem("adminAuth", "true");
-      window.location.href = "/admin-dashboard";
-    } else {
-      alert("Invalid admin credentials");
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      if (res.data.token) {
+        localStorage.setItem("adminToken", res.data.token);
+        localStorage.setItem("adminAuth", "true");
+
+        alert("Login Successful");
+
+        window.location.href = "/admin-dashboard";
+      }
+
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+        "Login Failed"
+      );
     }
   };
 

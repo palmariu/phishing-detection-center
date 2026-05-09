@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RiskGauge from "../components/RiskGauge";
+import axios from "axios";
 
 const ScanResult = () => {
   const result = {
@@ -9,6 +10,40 @@ const ScanResult = () => {
     status: "Malicious",
     threatType: "Phishing",
     message: "Suspicious login page detected",
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/export-pdf",
+        result,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const file = new Blob(
+        [response.data],
+        { type: "application/pdf" }
+      );
+
+      const fileURL = window.URL.createObjectURL(file);
+
+      const link = document.createElement("a");
+      link.href = fileURL;
+      link.setAttribute(
+        "download",
+        "Phishing-Scan-Report.pdf"
+      );
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+    } catch (error) {
+      console.log(error);
+      alert("PDF download failed");
+    }
   };
 
   return (
@@ -70,6 +105,13 @@ const ScanResult = () => {
                   </span>{" "}
                   {result.message}
                 </div>
+
+                <button
+                  onClick={handleDownloadPDF}
+                  className="w-full mt-6 py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 transition font-semibold text-slate-950"
+                >
+                  Download PDF Report
+                </button>
 
               </div>
             </div>
