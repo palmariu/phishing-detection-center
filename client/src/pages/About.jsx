@@ -20,10 +20,12 @@ const About = () => {
             </h1>
 
             <p className="text-slate-400 mt-4 max-w-3xl mx-auto">
-              A cybersecurity-focused phishing URL detection system designed to
-              analyze suspicious URLs, domains, and IP addresses for phishing,
-              malware, scam activity, and malicious behavior using intelligent
-              threat detection techniques.
+             Phishing Detection Center is a full-stack cybersecurity project
+        developed to detect and analyze suspicious URLs in real time.
+        The platform helps users identify phishing websites by performing
+        advanced security checks such as WHOIS lookup, SSL certificate
+        validation, VirusTotal malware analysis, website screenshot preview,
+        and downloadable PDF security reports.
             </p>
           </div>
 
@@ -36,9 +38,9 @@ const About = () => {
               </h2>
 
               <p className="text-slate-400 leading-relaxed">
-                The main objective of this project is to help users identify
-                dangerous phishing websites before they become victims of scams,
-                credential theft, fake login pages, and malware attacks.
+                The system also includes a secure Admin Panel with protected login,
+        scan history management, delete functionality, search filters,
+        and threat statistics visualization for better monitoring and analysis.
               </p>
             </div>
 
@@ -117,9 +119,11 @@ const About = () => {
             </h2>
 
             <p className="text-slate-400 leading-relaxed">
-              Final Year Cybersecurity Project developed for academic research,
-              demonstration, and practical phishing detection implementation
-              using modern full-stack web technologies.
+            
+           Phishing Detection Center
+by Umar Abdullah
+A full-stack cybersecurity platform for real-time phishing URL detection and threat analysis. Features include WHOIS lookup, SSL verification, VirusTotal integration, screenshot previews, PDF reporting, and a secure admin dashboard — built with React.js, Node.js, Express.js, and MongoDB.
+Defending the web, one URL at a time.  
             </p>
           </div>
 

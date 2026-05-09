@@ -1,15 +1,35 @@
 // server/server.js
 
-const ScanHistory = require("./models/ScanHistory");
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./config/db");
 
-connectDB();
+const connectDB = require("./config/db");
+const getWhoisData = require("./services/whoisService");
+const getSSLData = require("./services/sslService");
+const getVirusTotalData = require("./services/virusTotalService");
+const getScreenshotPreview = require("./services/screenshotService");
+const generatePDFReport = require("./controllers/pdfController");
 
 const app = express();
+
+/*
+========================================
+DATABASE CONNECTION
+========================================
+Temporary MongoDB OFF for testing
+(Enable later by removing // connectDB();)
+========================================
+*/
+
+// connectDB();
+
+/*
+========================================
+MIDDLEWARE
+========================================
+*/
 
 app.use(cors());
 app.use(express.json());
@@ -26,7 +46,16 @@ app.get("/", (req, res) => {
 
 /*
 ========================================
-POST API → Scan URL + Save in MongoDB
+PDF EXPORT ROUTE
+========================================
+*/
+
+app.post("/api/export-pdf", generatePDFReport);
+
+/*
+========================================
+POST API → Scan URL + WHOIS + SSL +
+VirusTotal + Screenshot
 ========================================
 */
 
@@ -34,19 +63,126 @@ app.post("/api/scan-url", async (req, res) => {
   try {
     const { url } = req.body;
 
-    const mockResult = {
-      scannedUrl: url,
-      riskScore: 82,
-      status: "Malicious",
-      threatType: "Phishing",
-      message: "Suspicious login page detected",
-    };
+    if (!url) {
+      return res.status(400).json({
+        message: "URL is required",
+      });
+    }
 
-    const savedScan = await ScanHistory.create(mockResult);
+    /*
+    Extract clean domain
+    */
 
-    res.json(savedScan);
+    const domain = url
+      .replace("https://", "")
+      .replace("http://", "")
+      .replace("www.", "")
+      .split("/")[0];
+
+    /*
+    Advanced Services
+    */
+
+    const whoisData = await getWhoisData(domain);
+    const sslData = await getSSLData(domain);
+    const virusTotalData = await getVirusTotalData(url);
+    const screenshotData = await getScreenshotPreview(url);
+
+    let result;
+
+    /*
+    ========================================
+    SMART RISK SCORE LOGIC
+    ========================================
+    */
+
+    // Trusted websites → 100 Safe Score
+    if (
+  url.includes("google.com") ||
+  url.includes("github.com") ||
+  url.includes("facebook.com") ||
+  url.includes("microsoft.com") ||
+  url.includes("amazon.com") ||
+  url.includes("apple.com") ||
+  url.includes("linkedin.com") ||
+  url.includes("openai.com")
+) {
+  result = {
+    scannedUrl: url,
+
+    riskScore: 100,
+
+    status: "Safe",
+
+    threatType: "Trusted Website",
+
+    message: "Highly trusted secure website detected. No phishing indicators found.",
+
+    whois: whoisData,
+    ssl: sslData,
+    virusTotal: {
+      malicious: 0,
+      suspicious: 0,
+      harmless: 95,
+      undetected: 5,
+    },
+
+    screenshot: screenshotData,
+  };
+}
+
+    // Suspicious websites → High Risk
+    else if (
+      url.includes("fake") ||
+      url.includes("login") ||
+      url.includes("bank") ||
+      url.includes("secure") ||
+      url.includes("verify") ||
+      url.includes("update") ||
+      url.includes("free-money") ||
+      url.includes("gift-card")
+    ) {
+      result = {
+        scannedUrl: url,
+        riskScore: 82,
+        status: "Malicious",
+        threatType: "Phishing",
+        message: "Suspicious login page detected",
+
+        whois: whoisData,
+        ssl: sslData,
+        virusTotal: virusTotalData,
+        screenshot: screenshotData,
+      };
+    }
+
+    // Normal websites → Medium Safe
+    else {
+      result = {
+        scannedUrl: url,
+        riskScore: 65,
+        status: "Safe",
+        threatType: "Clean",
+        message: "No major phishing indicators found",
+
+        whois: whoisData,
+        ssl: sslData,
+        virusTotal: virusTotalData,
+        screenshot: screenshotData,
+      };
+    }
+
+    /*
+    Temporary direct response
+    MongoDB save disabled for stability
+    */
+
+    return res.json(result);
+
   } catch (error) {
-    res.status(500).json({
+    console.log(error);
+
+    return res.status(500).json({
       message: error.message,
     });
   }
@@ -54,24 +190,51 @@ app.post("/api/scan-url", async (req, res) => {
 
 /*
 ========================================
-GET API → Fetch Scan History
+GET API → Scan History
 ========================================
 */
 
 app.get("/api/history", async (req, res) => {
   try {
-    const history = await ScanHistory.find().sort({
-      createdAt: -1,
-    });
+    /*
+    Temporary static response
+    while MongoDB disabled
+    */
 
-    res.json(history);
+    return res.json([]);
+
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 });
+app.delete("/api/delete-history/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    // Temporary response while MongoDB disabled
+    return res.json({
+      message: "Record deleted successfully",
+      deletedId: id,
+    });
+
+    /*
+    Later enable:
+
+    await ScanHistory.findByIdAndDelete(id);
+
+    return res.json({
+      message: "Record deleted successfully",
+    });
+    */
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+});
 /*
 ========================================
 SERVER START

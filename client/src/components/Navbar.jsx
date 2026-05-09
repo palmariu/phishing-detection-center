@@ -1,4 +1,5 @@
 import { ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -15,6 +16,7 @@ const Navbar = () => {
             <h1 className="text-lg font-bold text-white">
               Phishing Detection Center
             </h1>
+
             <p className="text-xs text-slate-400">
               Cyber Threat Intelligence
             </p>
@@ -23,27 +25,45 @@ const Navbar = () => {
 
         {/* Nav Links */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <a href="#" className="text-slate-300 hover:text-cyan-400 transition">
+
+          <Link
+            to="/"
+            className="text-slate-300 hover:text-cyan-400 transition"
+          >
             Home
-          </a>
+          </Link>
 
-          <a href="#" className="text-slate-300 hover:text-cyan-400 transition">
+          <Link
+            to="/dashboard"
+            className="text-slate-300 hover:text-cyan-400 transition"
+          >
             Dashboard
-          </a>
+          </Link>
 
-          <a href="#" className="text-slate-300 hover:text-cyan-400 transition">
+          <Link
+            to="/scan-results"
+            className="text-slate-300 hover:text-cyan-400 transition"
+          >
             Scan Results
-          </a>
+          </Link>
 
-          <a href="#" className="text-slate-300 hover:text-cyan-400 transition">
+          <Link
+            to="/about"
+            className="text-slate-300 hover:text-cyan-400 transition"
+          >
             About
-          </a>
+          </Link>
+
         </div>
 
-        {/* Button */}
-        <button className="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 transition font-semibold text-slate-950">
+        {/* Start Scan Button */}
+        <Link
+          to="/"
+          className="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 transition font-semibold text-slate-950"
+        >
           Start Scan
-        </button>
+        </Link>
+
       </div>
     </nav>
   );
