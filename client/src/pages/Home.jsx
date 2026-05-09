@@ -15,7 +15,7 @@ const Home = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/scan-url", {
+      const response = await fetch("https://phishing-detection-center-3.onrender.com/api/scan-url", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +37,7 @@ const Home = () => {
   const handleDownloadPDF = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/export-pdf",
+        "https://phishing-detection-center-3.onrender.com/api/export-pdf",
         {
           method: "POST",
           headers: {

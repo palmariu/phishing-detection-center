@@ -6,28 +6,39 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+      const response = await axios.post(
+        "https://phishing-detection-center-3.onrender.com/api/auth/login",
         {
           email,
           password,
         }
       );
 
-      if (res.data.token) {
-        localStorage.setItem("adminToken", res.data.token);
-        localStorage.setItem("adminAuth", "true");
+      localStorage.setItem(
+        "adminToken",
+        response.data.token
+      );
 
-        alert("Login Successful");
+      localStorage.setItem(
+        "adminAuth",
+        "true"
+      );
 
-        window.location.href = "/admin-dashboard";
-      }
+      alert("Login Successful");
+
+      window.location.href = "/admin-dashboard";
 
     } catch (error) {
+      console.log(error);
       alert(
-        error.response?.data?.message ||
-        "Login Failed"
+        error?.response?.data?.message ||
+        "Login failed"
       );
     }
   };
@@ -62,7 +73,7 @@ const AdminLogin = () => {
             onClick={handleLogin}
             className="w-full py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 transition font-semibold text-slate-950"
           >
-            Login
+            Secure Login
           </button>
 
         </div>
