@@ -15,7 +15,7 @@ const ScanResult = () => {
   const handleDownloadPDF = async () => {
     try {
       const response = await axios.post(
-        "https://phishing-detection-center-3.onrender.com/api/export-pdf",
+        "https://phishing-detection-center-backend.onrender.com/api/export-pdf",
         result,
         {
           responseType: "blob",

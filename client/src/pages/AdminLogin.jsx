@@ -13,7 +13,7 @@ const AdminLogin = () => {
 
     try {
       const response = await axios.post(
-        "https://phishing-detection-center-3.onrender.com/api/auth/login",
+        "https://phishing-detection-center-backend.onrender.com/api/auth/login",
         {
           email,
           password,

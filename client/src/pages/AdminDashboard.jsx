@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("https://phishing-detection-center-3.onrender.com/api/history")
+    fetch("https://phishing-detection-center-backend.onrender.com/api/history")
       .then((res) => res.json())
       .then((data) => {
         setHistory(data);
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
   const handleDelete = async (id) => {
     try {
       await fetch(
-        `https://phishing-detection-center-3.onrender.com/api/delete-history/${id}`,
+        `https://phishing-detection-center-backend.onrender.com/api/delete-history/${id}`,
         {
           method: "DELETE",
         }
